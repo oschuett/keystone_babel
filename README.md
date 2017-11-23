@@ -11,3 +11,9 @@ export OS_USERNAME="<your_username>"
 export OS_PASSWORD="<your_password>"
 export OS_TENANT_ID="<your_project_id>"
 ```
+
+Instead of `OS_TENANT_ID` you can also use:
+```
+export OS_TENANT_NAME="<your_project_name>"
+export OS_PROJECT_DOMAIN_NAME="<your_project_domain>"
+```

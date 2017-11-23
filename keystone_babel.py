@@ -17,6 +17,11 @@ OS_IDENTITY_PROVIDER_URL = 'https://kc.cscs.ch/auth/realms/cscs/protocol/saml/'
 OS_PROTOCOL = 'mapped'
 OS_INTERFACE = 'public'
 
+
+# TODO implement / forward entire keystone API
+# https://developer.openstack.org/api-ref/identity/v3/
+
+
 #===============================================================================
 @app.route('/v3/auth/tokens', methods=['POST'])
 def tokens():
@@ -37,20 +42,18 @@ def tokens():
     sess = session.Session(auth=auth)
     unscoped_token = sess.get_token()
 
-    # get scoped token for given project
-    project_id = body['auth']['scope']['project']['id']
-    body = {"auth": {
-                "identity": {
-                    "methods": ["token"],
-                     "token": {"id": unscoped_token}
-                 },
-                 "scope": { "project": {"id": project_id}}
-    }}
+    # patch original body
+    del(body['auth']['identity'])
+    body['auth']['identity'] = {"methods": ["token"],
+                                "token": {"id": unscoped_token}}
+
+    # get scoped token
     r = requests.post(OS_AUTH_URL+'/auth/tokens', json=body)
+
+    # TODO: maybe patch service catalog?
 
     # forward response
     return flask.Response(r.text, headers=dict(r.headers), status=r.status_code)
-
 
 #===============================================================================
 if __name__ == "__main__":
